@@ -4,6 +4,7 @@
 
 `verilator_config
 
+lint_off -rule UNUSED -file "../../../hw/soc_sonhamos/soc_sonhamos.sv" -match "Signal is not used: 'ext_master_resp'"
 lint_off -rule UNUSED -file "../../../hw/soc_sonhamos/soc_sonhamos.sv" -match "Signal is not used: 'ext_xbar_slave_req'"
 lint_off -rule UNUSED -file "../../../hw/soc_sonhamos/soc_sonhamos.sv" -match "Signal is not used: 'dma_done'"
 lint_off -rule UNUSED -file "../../../hw/soc_sonhamos/soc_sonhamos.sv" -match "Signal is not used: 'ext_ao_peripheral_resp'"

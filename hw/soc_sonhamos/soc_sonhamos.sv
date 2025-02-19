@@ -50,10 +50,10 @@ module soc_sonhamos #(
   reg_rsp_t ext_xbar_slave_resp;
   reg_req_t ext_periph_slave_req;
   reg_rsp_t ext_periph_slave_resp;
-  obi_req_t [soc_sonhamos_pkg::CGRA_XBAR_NMASTER-1:0] ext_master_req;
-  obi_resp_t [soc_sonhamos_pkg::CGRA_XBAR_NMASTER-1:0] ext_master_resp;
-  obi_req_t [soc_sonhamos_pkg::CGRA_XBAR_NMASTER-1:0] heep_slave_req;
-  obi_resp_t [soc_sonhamos_pkg::CGRA_XBAR_NMASTER-1:0] heep_slave_resp;
+  obi_req_t [soc_sonhamos_pkg::LOG_EXT_XBAR_NMASTER-1:0] ext_master_req;
+  obi_resp_t [soc_sonhamos_pkg::LOG_EXT_XBAR_NMASTER-1:0] ext_master_resp;
+  obi_req_t [soc_sonhamos_pkg::LOG_EXT_XBAR_NMASTER-1:0] heep_slave_req;
+  obi_resp_t [soc_sonhamos_pkg::LOG_EXT_XBAR_NMASTER-1:0] heep_slave_resp;
 
   // Unconnected signals
   obi_req_t heep_core_instr_req;
@@ -84,10 +84,6 @@ module soc_sonhamos #(
   // External interrupts
   logic [core_v_mini_mcu_pkg::NEXT_INT-1:0] intr_vector_ext;
 
-  // CGRA signals
-  logic cgra_int;
-  logic cgra_enable;
-  logic cgra_logic_rst_n;
 
   // External subsystems
   logic external_subsystem_rst_n;
@@ -103,55 +99,40 @@ module soc_sonhamos #(
   // The external bus connects the external peripherals among them and to
   // the corresponding X-HEEP slave port (to the internal system bus).
   ext_bus #(
-      .EXT_XBAR_NMASTER(CGRA_XBAR_NMASTER),
-      .EXT_XBAR_NSLAVE (1)
+      .EXT_XBAR_NMASTER(LOG_EXT_XBAR_NMASTER),
+      .EXT_XBAR_NSLAVE (LOG_EXT_XBAR_NSLAVE)
   ) ext_bus_i (
-      .clk_i        (clk_i),
-      .rst_ni       (rst_ni),
-      .addr_map_i   (EXT_XBAR_ADDR_RULES),
-      .default_idx_i('0),
-      .heep_core_instr_req_i    (heep_core_instr_req),
-      .heep_core_instr_resp_o   (heep_core_instr_resp),
-      .heep_core_data_req_i     (heep_core_data_req),
-      .heep_core_data_resp_o    (heep_core_data_resp),
-      .heep_debug_master_req_i  (heep_debug_master_req),
-      .heep_debug_master_resp_o (heep_debug_master_resp),
-      .heep_dma_read_req_i  (heep_dma_read_req),
-      .heep_dma_read_resp_o (heep_dma_read_resp),
-      .heep_dma_write_req_i (heep_dma_write_req),
-      .heep_dma_write_resp_o(heep_dma_write_resp),
-      .heep_dma_addr_req_i  (heep_dma_addr_req),
-      .heep_dma_addr_resp_o (heep_dma_addr_resp),
-      .ext_master_req_i (ext_master_req),
-      .ext_master_resp_o(ext_master_resp),
-      .heep_slave_req_o (heep_slave_req),
-      .heep_slave_resp_i(heep_slave_resp),
-      .ext_slave_req_o  (ext_xbar_slave_req),
-      .ext_slave_resp_i (ext_xbar_slave_resp)
+      .clk_i                   (clk_i),
+      .rst_ni                  (rst_ni),
+      .addr_map_i              (EXT_PERIPHERALS_ADDR_RULES),
+      .default_idx_i           ('0),
+      .heep_core_instr_req_i   (heep_core_instr_req),
+      .heep_core_instr_resp_o  (heep_core_instr_resp),
+      .heep_core_data_req_i    (heep_core_data_req),
+      .heep_core_data_resp_o   (heep_core_data_resp),
+      .heep_debug_master_req_i (heep_debug_master_req),
+      .heep_debug_master_resp_o(heep_debug_master_resp),
+      .heep_dma_read_req_i     (heep_dma_read_req),
+      .heep_dma_read_resp_o    (heep_dma_read_resp),
+      .heep_dma_write_req_i    (heep_dma_write_req),
+      .heep_dma_write_resp_o   (heep_dma_write_resp),
+      .heep_dma_addr_req_i     (heep_dma_addr_req),
+      .heep_dma_addr_resp_o    (heep_dma_addr_resp),
+      .ext_master_req_i        (ext_master_req),
+      .ext_master_resp_o       (ext_master_resp),
+      .heep_slave_req_o        (heep_slave_req),
+      .heep_slave_resp_i       (heep_slave_resp),
+      .ext_slave_req_o         (ext_xbar_slave_req),
+      .ext_slave_resp_i        (ext_xbar_slave_resp)
   );
 
-  // CGRA logic clock gating unit enable (always-on in this case)
-  assign cgra_enable      = 1'b1;
-  assign cgra_logic_rst_n = rst_ni && external_subsystem_rst_n;
+  assign ext_master_req = '0;
 
-  always_comb begin
-    // All interrupt lines set to zero by default
-    for (int i = 0; i < core_v_mini_mcu_pkg::NEXT_INT; i++) begin
-      intr_vector_ext[i] = 1'b0;
-    end
-    // Re-assign the interrupt lines used here
-    intr_vector_ext[0] = cgra_int;
-  end
-
-  strela_top_wrapper strela_top_wrapper_i (
+  template_ip template_ip_i (
       .clk_i,
-      .rst_ni(cgra_logic_rst_n),
-      .en_i(cgra_enable),
-      .masters_req_o(ext_master_req),
-      .masters_resp_i(ext_master_resp),
-      .reg_req_i(ext_periph_slave_req),
-      .reg_rsp_o(ext_periph_slave_resp),
-      .intr_o(cgra_int)
+      .rst_ni(rst_ni || external_subsystem_rst_n),
+      .reg_req_i (ext_periph_slave_req),
+      .reg_rsp_o(ext_periph_slave_resp)
   );
 
   // eXtension Interface
@@ -161,7 +142,7 @@ module soc_sonhamos #(
       .COREV_PULP(COREV_PULP),
       .FPU(FPU),
       .ZFINX(ZFINX),
-      .EXT_XBAR_NMASTER(CGRA_XBAR_NMASTER),
+      .EXT_XBAR_NMASTER(LOG_EXT_XBAR_NMASTER),
       .X_EXT(X_EXT)
   ) x_heep_system_i (
       .clk_i,
@@ -261,6 +242,7 @@ module soc_sonhamos #(
   );
 
   // Asign undriven signals
+  assign intr_vector_ext = '0;
   assign ext_xbar_slave_resp = '0;
   assign ext_dma_slot_tx = '0;
   assign ext_dma_slot_rx = '0;

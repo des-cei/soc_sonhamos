@@ -1,0 +1,55 @@
+// Copyright lowRISC contributors.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+// Daniel Vazquez (daniel.vazquez@upm.es)
+
+{
+  name: "template_ip",
+  clock_primary: "clk_i",
+  bus_interfaces: [
+    { protocol: "reg_iface", direction: "device" }
+  ],
+  regwidth: "32",
+  registers: [
+    { name:     "CTRL",
+      desc:     "Template IP control register",
+      resval:   0,
+      swaccess: "wo",
+      hwaccess: "hrw",
+      fields: [
+        { bits: "0", name: "EN",   desc: "Enable operation" }
+        { bits: "1", name: "CLR",   desc: "Clear output register" }
+      ]
+    }
+
+    { name:     "DIN_0",
+      desc:     "Template IP data input 0 register",
+      resval:   0,
+      swaccess: "rw",
+      hwaccess: "hrw",
+      fields: [
+        { bits: "31:0", name: "DIN_0", desc: "Template IP data input 0 register" }
+      ]
+    }
+
+    { name:     "DIN_1",
+      desc:     "Template IP data input 1 register",
+      resval:   0,
+      swaccess: "rw",
+      hwaccess: "hrw",
+      fields: [
+        { bits: "31:0", name: "DIN_1", desc: "Template IP data input 1 register" }
+      ]
+    }
+
+    { name:     "RESULT",
+      desc:     "Template IP output register",
+      resval:   0,
+      swaccess: "ro",
+      hwaccess: "hrw",
+      fields: [
+        { bits: "31:0", name: "RESULT", desc: "Template IP output result register" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+CAPI=2:
+
+# Copyright 2024 CEI-UPM
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+name: "ceiupm::template_ip"
+description: "Template IP"
+
+filesets:
+  files_rtl:
+    depend:
+    - x-heep::packages
+    - pulp-platform.org::common_cells
+    files:
+    - rtl/template_ip_reg_pkg.sv
+    - rtl/template_ip_reg_top.sv
+    - rtl/mmio_interface.sv
+    - rtl/template_ip.sv
+    file_type: systemVerilogSource
+
+  files_verilator_waiver:
+    files:
+    - lint/template_ip.vlt
+    file_type: vlt
+
+targets:
+  default:
+    filesets:
+    - files_rtl
+    - tool_verilator? (files_verilator_waiver)
