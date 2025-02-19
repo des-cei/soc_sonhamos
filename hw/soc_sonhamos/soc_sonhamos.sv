@@ -41,6 +41,9 @@ module soc_sonhamos #(
   import obi_pkg::*;
   import reg_pkg::*;
   import soc_sonhamos_pkg::*;
+  import core_v_mini_mcu_pkg::*;
+
+  localparam AO_SPC_NUM = 1;
 
   // External master and peripheral ports
   reg_req_t ext_xbar_slave_req;
@@ -59,16 +62,21 @@ module soc_sonhamos #(
   obi_resp_t heep_core_data_resp;
   obi_req_t heep_debug_master_req;
   obi_resp_t heep_debug_master_resp;
-  obi_req_t heep_dma_read_ch0_req;
-  obi_resp_t heep_dma_read_ch0_resp;
-  obi_req_t heep_dma_write_ch0_req;
-  obi_resp_t heep_dma_write_ch0_resp;
-  obi_req_t heep_dma_addr_ch0_req;
-  obi_resp_t heep_dma_addr_ch0_resp;
+  obi_req_t [core_v_mini_mcu_pkg::DMA_NUM_MASTER_PORTS-1:0] heep_dma_read_req;
+  obi_resp_t [core_v_mini_mcu_pkg::DMA_NUM_MASTER_PORTS-1:0] heep_dma_read_resp;
+  obi_req_t [core_v_mini_mcu_pkg::DMA_NUM_MASTER_PORTS-1:0] heep_dma_write_req;
+  obi_resp_t [core_v_mini_mcu_pkg::DMA_NUM_MASTER_PORTS-1:0] heep_dma_write_resp;
+  obi_req_t [core_v_mini_mcu_pkg::DMA_NUM_MASTER_PORTS-1:0] heep_dma_addr_req;
+  obi_resp_t [core_v_mini_mcu_pkg::DMA_NUM_MASTER_PORTS-1:0] heep_dma_addr_resp;
 
   // External DMA slots
   logic [core_v_mini_mcu_pkg::DMA_CH_NUM-1:0] ext_dma_slot_tx;
   logic [core_v_mini_mcu_pkg::DMA_CH_NUM-1:0] ext_dma_slot_rx;
+  logic [core_v_mini_mcu_pkg::DMA_CH_NUM-1:0] dma_done;
+
+  // External SPC interface signals
+  reg_req_t [AO_SPC_NUM-1:0] ext_ao_peripheral_req;
+  reg_rsp_t [AO_SPC_NUM-1:0] ext_ao_peripheral_resp;
 
   // DMA stop
   // logic [core_v_mini_mcu_pkg::DMA_CH_NUM-1:0] ext_dma_stop;
@@ -102,20 +110,18 @@ module soc_sonhamos #(
       .rst_ni       (rst_ni),
       .addr_map_i   (EXT_XBAR_ADDR_RULES),
       .default_idx_i('0),
-
       .heep_core_instr_req_i    (heep_core_instr_req),
       .heep_core_instr_resp_o   (heep_core_instr_resp),
       .heep_core_data_req_i     (heep_core_data_req),
       .heep_core_data_resp_o    (heep_core_data_resp),
       .heep_debug_master_req_i  (heep_debug_master_req),
       .heep_debug_master_resp_o (heep_debug_master_resp),
-      .heep_dma_read_ch0_req_i  (heep_dma_read_ch0_req),
-      .heep_dma_read_ch0_resp_o (heep_dma_read_ch0_resp),
-      .heep_dma_write_ch0_req_i (heep_dma_write_ch0_req),
-      .heep_dma_write_ch0_resp_o(heep_dma_write_ch0_resp),
-      .heep_dma_addr_ch0_req_i  (heep_dma_addr_ch0_req),
-      .heep_dma_addr_ch0_resp_o (heep_dma_addr_ch0_resp),
-
+      .heep_dma_read_req_i  (heep_dma_read_req),
+      .heep_dma_read_resp_o (heep_dma_read_resp),
+      .heep_dma_write_req_i (heep_dma_write_req),
+      .heep_dma_write_resp_o(heep_dma_write_resp),
+      .heep_dma_addr_req_i  (heep_dma_addr_req),
+      .heep_dma_addr_resp_o (heep_dma_addr_resp),
       .ext_master_req_i (ext_master_req),
       .ext_master_resp_o(ext_master_resp),
       .heep_slave_req_o (heep_slave_req),
@@ -218,7 +224,6 @@ module soc_sonhamos #(
       .i2c_scl_io(gpio_io[31]),
       .exit_value_o,
       .intr_vector_ext_i(intr_vector_ext),
-      .cgra_ext_fast_intr_i(cgra_int),
       .xif_compressed_if(ext_if),
       .xif_issue_if(ext_if),
       .xif_commit_if(ext_if),
@@ -233,23 +238,33 @@ module soc_sonhamos #(
       .ext_core_data_resp_i(heep_core_data_resp),
       .ext_debug_master_req_o(heep_debug_master_req),
       .ext_debug_master_resp_i(heep_debug_master_resp),
-      .ext_dma_read_ch0_req_o(heep_dma_read_ch0_req),
-      .ext_dma_read_ch0_resp_i(heep_dma_read_ch0_resp),
-      .ext_dma_write_ch0_req_o(heep_dma_write_ch0_req),
-      .ext_dma_write_ch0_resp_i(heep_dma_write_ch0_resp),
-      .ext_dma_addr_ch0_req_o(heep_dma_addr_ch0_req),
-      .ext_dma_addr_ch0_resp_i(heep_dma_addr_ch0_resp),
+      .ext_dma_read_req_o(heep_dma_read_req),
+      .ext_dma_read_resp_i(heep_dma_read_resp),
+      .ext_dma_write_req_o(heep_dma_write_req),
+      .ext_dma_write_resp_i(heep_dma_write_resp),
+      .ext_dma_addr_req_o(heep_dma_addr_req),
+      .ext_dma_addr_resp_i(heep_dma_addr_resp),
       .ext_peripheral_slave_req_o(ext_periph_slave_req),
       .ext_peripheral_slave_resp_i(ext_periph_slave_resp),
+      .ext_ao_peripheral_req_i(ext_ao_peripheral_req),
+      .ext_ao_peripheral_resp_o(ext_ao_peripheral_resp),
       .external_subsystem_powergate_switch_no(external_subsystem_powergate_switch_n),
       .external_subsystem_powergate_switch_ack_ni(external_subsystem_powergate_switch_ack_n),
       .external_subsystem_powergate_iso_no(external_subsystem_powergate_iso_n),
       .external_subsystem_rst_no(external_subsystem_rst_n),
       .external_ram_banks_set_retentive_no(external_ram_banks_set_retentive_n),
       .external_subsystem_clkgate_en_no(external_subsystem_clkgate_en_n),
+      .dma_done_o(dma_done),
       .ext_dma_slot_tx_i(ext_dma_slot_tx),
       .ext_dma_slot_rx_i(ext_dma_slot_rx),
       .ext_dma_stop_i('0)
   );
+
+  // Asign undriven signals
+  assign ext_xbar_slave_resp = '0;
+  assign ext_dma_slot_tx = '0;
+  assign ext_dma_slot_rx = '0;
+  assign ext_ao_peripheral_req = '0;
+  assign external_subsystem_powergate_switch_ack_n = '1;
 
 endmodule  // soc_sonhamos

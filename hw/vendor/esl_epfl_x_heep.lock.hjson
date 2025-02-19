@@ -9,6 +9,6 @@
   upstream:
   {
     url: https://github.com/esl-epfl/x-heep.git
-    rev: 541617ebd73b463833990dbd72814310d67b6260
+    rev: f293a9ff11735e5a243a0c4910445bf78c4a0526
   }
 }

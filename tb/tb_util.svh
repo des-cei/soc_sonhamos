@@ -56,7 +56,7 @@ task tb_loadHEX;
     };
 
     while(!soc_sonhamos_i.x_heep_system_i.core_v_mini_mcu_i.debug_subsystem_i.dm_obi_top_i.master_gnt_i)
-      @(posedge soc_sonhamos_i.x_heep_system_i.core_v_mini_mcu_i.clk_i);
+    @(posedge soc_sonhamos_i.x_heep_system_i.core_v_mini_mcu_i.clk_i);
 
     #1;
     force soc_sonhamos_i.x_heep_system_i.core_v_mini_mcu_i.debug_subsystem_i.dm_obi_top_i.master_req_o = 1'b0;
@@ -98,27 +98,27 @@ task tb_loadHEX;
       tb_writetoSram3(w_addr, stimuli[i+3], stimuli[i+2], stimuli[i+1], stimuli[i]);
     end
   end
-  for (i = 131072; i < 262144; i = i + 4) begin
-    if (((i / 4) & 3) == 0) begin
-      w_addr = ((i / 4) >> 2) % 8192;
+  for (i = 131072; i < 163840; i = i + 4) begin
+    if (((i / 4) & 0) == 0) begin
+      w_addr = ((i / 4) >> 0) % 8192;
       tb_writetoSram4(w_addr, stimuli[i+3], stimuli[i+2], stimuli[i+1], stimuli[i]);
     end
   end
-  for (i = 131072; i < 262144; i = i + 4) begin
-    if (((i / 4) & 3) == 1) begin
-      w_addr = ((i / 4) >> 2) % 8192;
+  for (i = 163840; i < 196608; i = i + 4) begin
+    if (((i / 4) & 0) == 0) begin
+      w_addr = ((i / 4) >> 0) % 8192;
       tb_writetoSram5(w_addr, stimuli[i+3], stimuli[i+2], stimuli[i+1], stimuli[i]);
     end
   end
-  for (i = 131072; i < 262144; i = i + 4) begin
-    if (((i / 4) & 3) == 2) begin
-      w_addr = ((i / 4) >> 2) % 8192;
+  for (i = 196608; i < 229376; i = i + 4) begin
+    if (((i / 4) & 0) == 0) begin
+      w_addr = ((i / 4) >> 0) % 8192;
       tb_writetoSram6(w_addr, stimuli[i+3], stimuli[i+2], stimuli[i+1], stimuli[i]);
     end
   end
-  for (i = 131072; i < 262144; i = i + 4) begin
-    if (((i / 4) & 3) == 3) begin
-      w_addr = ((i / 4) >> 2) % 8192;
+  for (i = 229376; i < 262144; i = i + 4) begin
+    if (((i / 4) & 0) == 0) begin
+      w_addr = ((i / 4) >> 0) % 8192;
       tb_writetoSram7(w_addr, stimuli[i+3], stimuli[i+2], stimuli[i+1], stimuli[i]);
     end
   end

@@ -81,7 +81,6 @@ typedef enum fast_intr_ctrl_fast_interrupt {
   kGpio_5_fic_e   = 11,/*!< GPIO 5. */
   kGpio_6_fic_e   = 12,/*!< GPIO 6. */
   kGpio_7_fic_e   = 13,/*!< GPIO 7. */
-  kStrela_fic_e     = 14,/*!< STRELA. */
 } fast_intr_ctrl_fast_interrupt_t;
 
 /****************************************************************************/
@@ -238,15 +237,6 @@ void fic_irq_gpio_6(void);
  * inside peripherals connected through FIC
  */
 void fic_irq_gpio_7(void);
-
-/**
- * @brief fast interrupt controller irq for STRELA
- * `fast_intr_ctrl.c` provides a weak definition of this symbol, which can
- * be overridden at link-time by providing an additional non-weak definition
- * inside peripherals connected through FIC
- */
-void fic_irq_strela(void);
-
 
 
 /****************************************************************************/

@@ -1,17 +1,10 @@
 {
     ram_address: 0
-    bus_type: "NtoM",
+    bus_type: "onetoM",
     ram_banks: {
         code_and_data: {
-            num: 4
-            sizes: 32
-        }
-        data_interleaved: {
-            auto_section: auto
-            // the name is used by example_matadd_interleaved as .xheep_data_interleaved
-            type: interleaved
-            num: 4
-            size: 32
+            num: 8
+            sizes: [32]
         }
     }
 
@@ -21,11 +14,11 @@
             name: code
             start: 0
             #minimum size for freeRTOS and clang
-            size: 0x00000D800
+            size: 0x00000E800
         },
         {
             name: data
-            start: 0x00000D800
+            start: 0x00000E800
         }
     ]
 }
