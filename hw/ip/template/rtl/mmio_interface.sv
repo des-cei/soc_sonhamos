@@ -41,21 +41,21 @@ module mmio_interface
   );
 
   // Control signals
-  assign hw2reg.ctrl.en.de = reg2hw.ctrl.en.q;
-  assign hw2reg.ctrl.en.d  = 1'b0;
-  assign hw2reg.ctrl.clr.de   = reg2hw.ctrl.clr.q;
-  assign hw2reg.ctrl.clr.d    = 1'b0;
+  assign hw2reg.ctrl.en.de  = reg2hw.ctrl.en.q;
+  assign hw2reg.ctrl.en.d   = 1'b0;
+  assign hw2reg.ctrl.clr.de = reg2hw.ctrl.clr.q;
+  assign hw2reg.ctrl.clr.d  = 1'b0;
 
   // Data signals
-  assign din_0_o              = reg2hw.din_0.q;
-  assign hw2reg.din_0.de      = reg2hw.ctrl.clr.q;
-  assign hw2reg.din_0.d       = '0;
+  assign din_0_o            = reg2hw.din_0.q;
+  assign hw2reg.din_0.de    = reg2hw.ctrl.clr.q;
+  assign hw2reg.din_0.d     = '0;
 
-  assign din_1_o              = reg2hw.din_1.q;
-  assign hw2reg.din_1.de      = reg2hw.ctrl.clr.q;
-  assign hw2reg.din_1.d       = '0;
+  assign din_1_o            = reg2hw.din_1.q;
+  assign hw2reg.din_1.de    = reg2hw.ctrl.clr.q;
+  assign hw2reg.din_1.d     = '0;
 
-  assign hw2reg.result.de     = reg2hw.ctrl.clr.q || reg2hw.ctrl.en.q;
-  assign hw2reg.result.d      = reg2hw.ctrl.clr.q ? '0 : result_i;
+  assign hw2reg.result.de   = reg2hw.ctrl.clr.q || reg2hw.ctrl.en.q;
+  assign hw2reg.result.d    = reg2hw.ctrl.clr.q ? '0 : result_i;
 
 endmodule

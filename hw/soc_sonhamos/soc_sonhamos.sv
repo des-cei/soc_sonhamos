@@ -131,7 +131,7 @@ module soc_sonhamos #(
   template_ip template_ip_i (
       .clk_i,
       .rst_ni(rst_ni || external_subsystem_rst_n),
-      .reg_req_i (ext_periph_slave_req),
+      .reg_req_i(ext_periph_slave_req),
       .reg_rsp_o(ext_periph_slave_resp)
   );
 

@@ -56,7 +56,7 @@ task tb_loadHEX;
     };
 
     while(!soc_sonhamos_i.x_heep_system_i.core_v_mini_mcu_i.debug_subsystem_i.dm_obi_top_i.master_gnt_i)
-    @(posedge soc_sonhamos_i.x_heep_system_i.core_v_mini_mcu_i.clk_i);
+      @(posedge soc_sonhamos_i.x_heep_system_i.core_v_mini_mcu_i.clk_i);
 
     #1;
     force soc_sonhamos_i.x_heep_system_i.core_v_mini_mcu_i.debug_subsystem_i.dm_obi_top_i.master_req_o = 1'b0;
