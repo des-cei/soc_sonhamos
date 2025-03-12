@@ -11,8 +11,7 @@ module template_ip
     parameter int unsigned DataWidth = 32'd32,  // Data signal width
     // DEPENDENT PARAMETERS, DO NOT OVERWRITE!
     parameter int unsigned AddrWidth = (NumWords > 32'd1) ? $clog2(NumWords) : 32'd1
-)
-(
+) (
     // Clock and reset
     input logic clk_i,
     input logic rst_ni,
@@ -30,7 +29,7 @@ module template_ip
 
   logic [AddrWidth-1:0] mem_addr;
   logic [         31:0] mem_wdata;
-  logic rvalid_q;
+  logic                 rvalid_q;
 
 
   assign mem_addr = slave_req_i.addr[AddrWidth+1:2];

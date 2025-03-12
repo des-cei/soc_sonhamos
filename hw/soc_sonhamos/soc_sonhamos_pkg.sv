@@ -11,7 +11,7 @@ package soc_sonhamos_pkg;
   // Number of external IPs (MMIO interfaces)
   localparam EXT_NPERIPHERALS = 1;
   // Number of external master ports to access X-HEEP memory
-  localparam EXT_XBAR_NMASTER = 1; // Unused
+  localparam EXT_XBAR_NMASTER = 1;  // Unused
   // Number of external slave ports to access external memories from X-HEEP
   localparam EXT_XBAR_NSLAVE = 1;
 

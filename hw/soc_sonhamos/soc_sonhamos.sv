@@ -47,12 +47,12 @@ module soc_sonhamos #(
   localparam AO_SPC_NUM = 1;
 
   // External master and peripheral ports
-  obi_req_t   [EXT_XBAR_NSLAVE-1:0]  ext_xbar_slave_req;
-  obi_resp_t  [EXT_XBAR_NSLAVE-1:0]  ext_xbar_slave_resp;
-  obi_req_t   [EXT_XBAR_NMASTER_RND-1:0] ext_master_req;
-  obi_resp_t  [EXT_XBAR_NMASTER_RND-1:0] ext_master_resp;
-  obi_req_t   [EXT_XBAR_NMASTER_RND-1:0] heep_slave_req;
-  obi_resp_t  [EXT_XBAR_NMASTER_RND-1:0] heep_slave_resp;
+  obi_req_t [EXT_XBAR_NSLAVE-1:0]  ext_xbar_slave_req;
+  obi_resp_t [EXT_XBAR_NSLAVE-1:0]  ext_xbar_slave_resp;
+  obi_req_t [EXT_XBAR_NMASTER_RND-1:0] ext_master_req;
+  obi_resp_t [EXT_XBAR_NMASTER_RND-1:0] ext_master_resp;
+  obi_req_t [EXT_XBAR_NMASTER_RND-1:0] heep_slave_req;
+  obi_resp_t [EXT_XBAR_NMASTER_RND-1:0] heep_slave_resp;
 
   // Unconnected signals
   obi_req_t heep_core_instr_req;
@@ -61,12 +61,12 @@ module soc_sonhamos #(
   obi_resp_t heep_core_data_resp;
   obi_req_t heep_debug_master_req;
   obi_resp_t heep_debug_master_resp;
-  obi_req_t   [DMA_NUM_MASTER_PORTS-1:0] heep_dma_read_req;
-  obi_resp_t  [DMA_NUM_MASTER_PORTS-1:0] heep_dma_read_resp;
-  obi_req_t   [DMA_NUM_MASTER_PORTS-1:0] heep_dma_write_req;
-  obi_resp_t  [DMA_NUM_MASTER_PORTS-1:0] heep_dma_write_resp;
-  obi_req_t   [DMA_NUM_MASTER_PORTS-1:0] heep_dma_addr_req;
-  obi_resp_t  [DMA_NUM_MASTER_PORTS-1:0] heep_dma_addr_resp;
+  obi_req_t [DMA_NUM_MASTER_PORTS-1:0] heep_dma_read_req;
+  obi_resp_t [DMA_NUM_MASTER_PORTS-1:0] heep_dma_read_resp;
+  obi_req_t [DMA_NUM_MASTER_PORTS-1:0] heep_dma_write_req;
+  obi_resp_t [DMA_NUM_MASTER_PORTS-1:0] heep_dma_write_resp;
+  obi_req_t [DMA_NUM_MASTER_PORTS-1:0] heep_dma_addr_req;
+  obi_resp_t [DMA_NUM_MASTER_PORTS-1:0] heep_dma_addr_resp;
 
   // External DMA slots
   logic [core_v_mini_mcu_pkg::DMA_CH_NUM-1:0] ext_dma_slot_tx;
@@ -163,7 +163,7 @@ module soc_sonhamos #(
   assign ext_master_req = '0;
 
   template_ip #(
-      .NumWords(8192),
+      .NumWords (8192),
       .DataWidth(32'd32)
   ) template_ip_i (
       .clk_i,
