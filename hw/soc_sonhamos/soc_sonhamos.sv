@@ -47,8 +47,8 @@ module soc_sonhamos #(
   localparam AO_SPC_NUM = 1;
 
   // External master and peripheral ports
-  obi_req_t [EXT_XBAR_NSLAVE-1:0]  ext_xbar_slave_req;
-  obi_resp_t [EXT_XBAR_NSLAVE-1:0]  ext_xbar_slave_resp;
+  obi_req_t [EXT_XBAR_NSLAVE-1:0] ext_xbar_slave_req;
+  obi_resp_t [EXT_XBAR_NSLAVE-1:0] ext_xbar_slave_resp;
   obi_req_t [EXT_XBAR_NMASTER_RND-1:0] ext_master_req;
   obi_resp_t [EXT_XBAR_NMASTER_RND-1:0] ext_master_resp;
   obi_req_t [EXT_XBAR_NMASTER_RND-1:0] heep_slave_req;
