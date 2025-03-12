@@ -43,17 +43,16 @@ module soc_sonhamos #(
   import soc_sonhamos_pkg::*;
   import core_v_mini_mcu_pkg::*;
 
+  localparam EXT_XBAR_NMASTER_RND = EXT_XBAR_NMASTER > 0 ? EXT_XBAR_NMASTER : 1;
   localparam AO_SPC_NUM = 1;
 
   // External master and peripheral ports
-  reg_req_t ext_xbar_slave_req;
-  reg_rsp_t ext_xbar_slave_resp;
-  reg_req_t ext_periph_slave_req;
-  reg_rsp_t ext_periph_slave_resp;
-  obi_req_t [soc_sonhamos_pkg::LOG_EXT_XBAR_NMASTER-1:0] ext_master_req;
-  obi_resp_t [soc_sonhamos_pkg::LOG_EXT_XBAR_NMASTER-1:0] ext_master_resp;
-  obi_req_t [soc_sonhamos_pkg::LOG_EXT_XBAR_NMASTER-1:0] heep_slave_req;
-  obi_resp_t [soc_sonhamos_pkg::LOG_EXT_XBAR_NMASTER-1:0] heep_slave_resp;
+  obi_req_t   [EXT_XBAR_NSLAVE-1:0]  ext_xbar_slave_req;
+  obi_resp_t  [EXT_XBAR_NSLAVE-1:0]  ext_xbar_slave_resp;
+  obi_req_t   [EXT_XBAR_NMASTER_RND-1:0] ext_master_req;
+  obi_resp_t  [EXT_XBAR_NMASTER_RND-1:0] ext_master_resp;
+  obi_req_t   [EXT_XBAR_NMASTER_RND-1:0] heep_slave_req;
+  obi_resp_t  [EXT_XBAR_NMASTER_RND-1:0] heep_slave_resp;
 
   // Unconnected signals
   obi_req_t heep_core_instr_req;
@@ -62,12 +61,12 @@ module soc_sonhamos #(
   obi_resp_t heep_core_data_resp;
   obi_req_t heep_debug_master_req;
   obi_resp_t heep_debug_master_resp;
-  obi_req_t [core_v_mini_mcu_pkg::DMA_NUM_MASTER_PORTS-1:0] heep_dma_read_req;
-  obi_resp_t [core_v_mini_mcu_pkg::DMA_NUM_MASTER_PORTS-1:0] heep_dma_read_resp;
-  obi_req_t [core_v_mini_mcu_pkg::DMA_NUM_MASTER_PORTS-1:0] heep_dma_write_req;
-  obi_resp_t [core_v_mini_mcu_pkg::DMA_NUM_MASTER_PORTS-1:0] heep_dma_write_resp;
-  obi_req_t [core_v_mini_mcu_pkg::DMA_NUM_MASTER_PORTS-1:0] heep_dma_addr_req;
-  obi_resp_t [core_v_mini_mcu_pkg::DMA_NUM_MASTER_PORTS-1:0] heep_dma_addr_resp;
+  obi_req_t   [DMA_NUM_MASTER_PORTS-1:0] heep_dma_read_req;
+  obi_resp_t  [DMA_NUM_MASTER_PORTS-1:0] heep_dma_read_resp;
+  obi_req_t   [DMA_NUM_MASTER_PORTS-1:0] heep_dma_write_req;
+  obi_resp_t  [DMA_NUM_MASTER_PORTS-1:0] heep_dma_write_resp;
+  obi_req_t   [DMA_NUM_MASTER_PORTS-1:0] heep_dma_addr_req;
+  obi_resp_t  [DMA_NUM_MASTER_PORTS-1:0] heep_dma_addr_resp;
 
   // External DMA slots
   logic [core_v_mini_mcu_pkg::DMA_CH_NUM-1:0] ext_dma_slot_tx;
@@ -77,6 +76,14 @@ module soc_sonhamos #(
   // External SPC interface signals
   reg_req_t [AO_SPC_NUM-1:0] ext_ao_peripheral_req;
   reg_rsp_t [AO_SPC_NUM-1:0] ext_ao_peripheral_resp;
+
+  // Register interfaces
+  reg_req_t heep_periph_slv_req;
+  reg_rsp_t heep_periph_slv_resp;
+  reg_req_t [EXT_NPERIPHERALS-1:0] ext_periph_slv_req;
+  reg_rsp_t [EXT_NPERIPHERALS-1:0] ext_periph_slv_resp;
+
+  logic [EXT_PERIPHERALS_PORT_SEL_WIDTH-1:0] ext_periph_select;
 
   // DMA stop
   // logic [core_v_mini_mcu_pkg::DMA_CH_NUM-1:0] ext_dma_stop;
@@ -94,17 +101,44 @@ module soc_sonhamos #(
   logic external_subsystem_powergate_switch_ack_n;
   logic external_subsystem_powergate_iso_n;
 
-  // External bus
-  // ----------------------
-  // The external bus connects the external peripherals among them and to
-  // the corresponding X-HEEP slave port (to the internal system bus).
+  // External bus for register interfaces
+  addr_decode #(
+      .NoIndices(soc_sonhamos_pkg::EXT_NPERIPHERALS),
+      .NoRules(soc_sonhamos_pkg::EXT_NPERIPHERALS),
+      .addr_t(logic [31:0]),
+      .rule_t(addr_map_rule_pkg::addr_map_rule_t)
+  ) i_addr_decode_soc_regbus_ext_periphs (
+      .addr_i(heep_periph_slv_req.addr),
+      .addr_map_i(soc_sonhamos_pkg::EXT_PERIPHERALS_ADDR_RULES),
+      .idx_o(ext_periph_select),
+      .dec_valid_o(),
+      .dec_error_o(),
+      .en_default_idx_i(1'b0),
+      .default_idx_i('0)
+  );
+
+  reg_demux #(
+      .NoPorts(soc_sonhamos_pkg::EXT_NPERIPHERALS),
+      .req_t  (reg_pkg::reg_req_t),
+      .rsp_t  (reg_pkg::reg_rsp_t)
+  ) reg_demux_i (
+      .clk_i,
+      .rst_ni,
+      .in_select_i(ext_periph_select),
+      .in_req_i(heep_periph_slv_req),
+      .in_rsp_o(heep_periph_slv_resp),
+      .out_req_o(ext_periph_slv_req),
+      .out_rsp_i(ext_periph_slv_resp)
+  );
+
+  // External bus for Master and Slave inferfaces
   ext_bus #(
-      .EXT_XBAR_NMASTER(LOG_EXT_XBAR_NMASTER),
-      .EXT_XBAR_NSLAVE (LOG_EXT_XBAR_NSLAVE)
+      .EXT_XBAR_NMASTER(EXT_XBAR_NMASTER),
+      .EXT_XBAR_NSLAVE (EXT_XBAR_NSLAVE)
   ) ext_bus_i (
       .clk_i                   (clk_i),
       .rst_ni                  (rst_ni),
-      .addr_map_i              (EXT_PERIPHERALS_ADDR_RULES),
+      .addr_map_i              (EXT_XBAR_ADDR_RULES),
       .default_idx_i           ('0),
       .heep_core_instr_req_i   (heep_core_instr_req),
       .heep_core_instr_resp_o  (heep_core_instr_resp),
@@ -128,11 +162,16 @@ module soc_sonhamos #(
 
   assign ext_master_req = '0;
 
-  template_ip template_ip_i (
+  template_ip #(
+      .NumWords(8192),
+      .DataWidth(32'd32)
+  ) template_ip_i (
       .clk_i,
       .rst_ni(rst_ni || external_subsystem_rst_n),
-      .reg_req_i(ext_periph_slave_req),
-      .reg_rsp_o(ext_periph_slave_resp)
+      .reg_req_i(ext_periph_slv_req[TEMPLATE_IP_PERIPH_IDX]),
+      .reg_rsp_o(ext_periph_slv_resp[TEMPLATE_IP_PERIPH_IDX]),
+      .slave_req_i(ext_xbar_slave_req[TEMPLATE_MEMORY_IDX]),
+      .slave_resp_o(ext_xbar_slave_resp[TEMPLATE_MEMORY_IDX])
   );
 
   // eXtension Interface
@@ -142,7 +181,7 @@ module soc_sonhamos #(
       .COREV_PULP(COREV_PULP),
       .FPU(FPU),
       .ZFINX(ZFINX),
-      .EXT_XBAR_NMASTER(LOG_EXT_XBAR_NMASTER),
+      .EXT_XBAR_NMASTER(EXT_XBAR_NMASTER),
       .X_EXT(X_EXT)
   ) x_heep_system_i (
       .clk_i,
@@ -225,8 +264,8 @@ module soc_sonhamos #(
       .ext_dma_write_resp_i(heep_dma_write_resp),
       .ext_dma_addr_req_o(heep_dma_addr_req),
       .ext_dma_addr_resp_i(heep_dma_addr_resp),
-      .ext_peripheral_slave_req_o(ext_periph_slave_req),
-      .ext_peripheral_slave_resp_i(ext_periph_slave_resp),
+      .ext_peripheral_slave_req_o(heep_periph_slv_req),
+      .ext_peripheral_slave_resp_i(heep_periph_slv_resp),
       .ext_ao_peripheral_req_i(ext_ao_peripheral_req),
       .ext_ao_peripheral_resp_o(ext_ao_peripheral_resp),
       .external_subsystem_powergate_switch_no(external_subsystem_powergate_switch_n),
@@ -243,7 +282,6 @@ module soc_sonhamos #(
 
   // Asign undriven signals
   assign intr_vector_ext = '0;
-  assign ext_xbar_slave_resp = '0;
   assign ext_dma_slot_tx = '0;
   assign ext_dma_slot_rx = '0;
   assign ext_ao_peripheral_req = '0;

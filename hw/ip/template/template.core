@@ -12,6 +12,7 @@ filesets:
     depend:
     - x-heep::packages
     - pulp-platform.org::common_cells
+    - pulp-platform.org::tech_cells_generic
     files:
     - rtl/template_ip_reg_pkg.sv
     - rtl/template_ip_reg_top.sv
