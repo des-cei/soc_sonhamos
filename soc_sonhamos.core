@@ -13,6 +13,7 @@ filesets:
     - x-heep::packages
     - openhwgroup.org:systems:core-v-mini-mcu
     - ceiupm::template_ip
+    - polito:isa-lab:cnt:1.2.4
     files:
     - hw/soc_sonhamos/soc_sonhamos_pkg.sv
     - hw/soc_sonhamos/soc_sonhamos.sv

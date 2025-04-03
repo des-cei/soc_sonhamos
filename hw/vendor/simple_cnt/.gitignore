@@ -1,0 +1,11 @@
+# Build directory
+build
+
+# Automatically generated files
+hw/misc/verilator-waivers.vlt
+
+# Private directory
+private/
+
+# Visual Studio Code settings
+.vscode/

@@ -174,6 +174,18 @@ module soc_sonhamos #(
       .slave_resp_o(ext_xbar_slave_resp[TEMPLATE_MEMORY_IDX])
   );
 
+  cnt_obi #(
+      .W(32)
+  ) u_cnt_obi (
+      .clk_i    (clk_i),
+      .rst_ni   (rst_ni || external_subsystem_rst_n),
+      .reg_req_i(ext_periph_slv_req[SIMPLE_CNT_PERIPH_IDX]),
+      .reg_rsp_o(ext_periph_slv_resp[SIMPLE_CNT_PERIPH_IDX]),
+      .obi_req_i(ext_xbar_slave_req[SIMPLE_CNT_MEMORY_IDX]),
+      .obi_rsp_o(ext_xbar_slave_resp[SIMPLE_CNT_MEMORY_IDX]),
+      .tc_int_o (intr_vector_ext[0])
+  );
+
   // eXtension Interface
   if_xif #() ext_if ();
 
@@ -281,7 +293,7 @@ module soc_sonhamos #(
   );
 
   // Asign undriven signals
-  assign intr_vector_ext = '0;
+  assign intr_vector_ext[core_v_mini_mcu_pkg::NEXT_INT-1:1] = '0;
   assign ext_dma_slot_tx = '0;
   assign ext_dma_slot_rx = '0;
   assign ext_ao_peripheral_req = '0;

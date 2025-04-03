@@ -1,0 +1,41 @@
+#ifndef SOC_SONHAMOS_H
+#define SOC_SONHAMOS_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
+#include "core_v_mini_mcu.h"
+
+// Number of masters and slaves on the external crossbar
+#define EXT_XBAR_NMASTER 1
+#define EXT_XBAR_NSLAVE 2
+
+
+// Memory map
+// ----------
+
+
+
+// SIMPLE_CNT
+#define SIMPLE_CNT_START_ADDRESS EXT_SLAVE_START_ADDRESS + 0x00002000
+#define SIMPLE_CNT_SIZE 0x00001000
+#define SIMPLE_CNT_END_ADDRESS SIMPLE_CNT_START_ADDRESS + 0x00001000
+
+
+// Peripheral map
+// ----------
+
+
+
+// SIMPLE_CNT
+#define SIMPLE_CNT_PERIPH_START_ADDRESS EXT_PERIPHERAL_START_ADDRESS + 0x0001000
+#define SIMPLE_CNT_PERIPH_SIZE 0x0001000
+#define SIMPLE_CNT_PERIPH_END_ADDRESS SIMPLE_CNT_PERIPH_START_ADDRESS + 0x0001000
+
+
+#ifdef __cplusplus
+} // extern "C"
+#endif // __cplusplus
+
+#endif // SOC_SONHAMOS_H

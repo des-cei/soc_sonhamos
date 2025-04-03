@@ -1,0 +1,9 @@
+CAPI=2:
+
+name: polito:isa-lab:gen-waivers:1.0.0
+description: Verilator waiver files generator
+
+generators:
+  gen-waivers:
+    interpreter: python3
+    command: gen-waivers.py
