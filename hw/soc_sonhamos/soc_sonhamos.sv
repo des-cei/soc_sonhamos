@@ -162,16 +162,11 @@ module soc_sonhamos #(
 
   assign ext_master_req = '0;
 
-  template_ip #(
-      .NumWords (8192),
-      .DataWidth(32'd32)
-  ) template_ip_i (
+  template_ip template_ip_i (
       .clk_i,
       .rst_ni(rst_ni || external_subsystem_rst_n),
       .reg_req_i(ext_periph_slv_req[TEMPLATE_IP_PERIPH_IDX]),
-      .reg_rsp_o(ext_periph_slv_resp[TEMPLATE_IP_PERIPH_IDX]),
-      .slave_req_i(ext_xbar_slave_req[TEMPLATE_MEMORY_IDX]),
-      .slave_resp_o(ext_xbar_slave_resp[TEMPLATE_MEMORY_IDX])
+      .reg_rsp_o(ext_periph_slv_resp[TEMPLATE_IP_PERIPH_IDX])
   );
 
   cnt_obi #(
