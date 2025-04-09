@@ -53,7 +53,7 @@ vivado-fpga: mcu-gen
 	$(FUSESOC) --cores-root . run --no-export --target=$(FPGA_BOARD) --flag=use_bscane_xilinx --build ceiupm:systems:soc_sonhamos ${FUSESOC_PARAM} 2>&1 | tee buildvivado.log
 
 openocd:
-	openocd -f tb/core-v-mini-mcu-vc709-bscan.cfg
+	xterm -e openocd -f tb/core-v-mini-mcu-pynq-z2-bscan.cfg &
 
 gdb:
 	$(MAKE) app PROJECT=$(PROJECT) TARGET=pynq-z2
